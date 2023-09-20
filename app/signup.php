@@ -11,7 +11,71 @@
 
 <div class="container mt-5">
     <h2>Formulaire d'Inscription</h2>
-    <form action="#" method="POST">
+    <?php
+    // Vérifier si le formulaire a été soumis
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        // Récupérer les données du formulaire
+        $name = $_POST['prenom'];
+        $surname = $_POST['nom'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        // Valider et traiter les données (ajoutez ici vos validations)
+        $erreurs = [];
+
+        if (empty($name)) {
+            $erreurs[] = "Le prénom est requis.";
+        }
+
+        if (empty($surname)) {
+            $erreurs[] = "Le nom est requis.";
+        }
+
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $erreurs[] = "L'adresse e-mail est invalide.";
+        }
+
+        if (empty($password)) {
+            $erreurs[] = "Le mot de passe est requis.";
+        }
+
+        if ($_POST['password'] !== $_POST['password_repeat']) {
+            $erreurs[] = "Les mots de passe ne correspondent pas.";
+        }
+
+        // Si aucune erreur, insérer l'utilisateur dans la base de données (ajoutez votre code PDO ici)
+        if (empty($erreurs)) {
+            // Créez une connexion PDO (remplacez ces informations par les vôtres)
+            $host = 'mysql'; // Le nom du service Docker MySQL
+            $dbname = getenv('MYSQL_DATABASE');
+            $username = getenv('MYSQL_USER');
+            $passwd = getenv('MYSQL_PASSWORD');
+
+            try {
+                $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $passwd);
+            } catch (PDOException $e) {
+                die("Erreur de connexion à la base de données: " . $e->getMessage());
+            }
+
+            // Insérez les données dans la base de données
+            $sql = "INSERT INTO user (name, surname, email, password) VALUES (?, ?, ?, ?)";
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([$name, $surname, $email, password_hash($password, PASSWORD_DEFAULT)]);
+
+            // Redirigez l'utilisateur vers une page de confirmation
+            header("Location: confirmation.html");
+        } else {
+            // Afficher les erreurs
+            echo '<div class="alert alert-danger">';
+            foreach ($erreurs as $erreur) {
+                echo "<p>$erreur</p>";
+            }
+            echo '</div>';
+        }
+    }
+    ?>
+
+    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
         <!-- Champ : Prénom -->
         <div class="form-group">
             <label for="prenom">Prénom</label>
