@@ -1,3 +1,73 @@
+<?php
+session_start();
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Récupérer les données du formulaire
+    $name = $_POST['prenom'];
+    $surname = $_POST['nom'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Valider et traiter les données (ajoutez ici vos validations)
+    $erreurs = [];
+
+    if (empty($name)) {
+        $erreurs[] = "Le prénom est requis.";
+    }
+
+    if (empty($surname)) {
+        $erreurs[] = "Le nom est requis.";
+    }
+
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $erreurs[] = "L'adresse e-mail est invalide.";
+    }
+
+    if (empty($password)) {
+        $erreurs[] = "Le mot de passe est requis.";
+    }
+
+    if ($_POST['password'] !== $_POST['password_repeat']) {
+        $erreurs[] = "Les mots de passe ne correspondent pas.";
+    }
+
+    // Vérifier si l'adresse e-mail existe déjà dans la base de données
+    // Créez une connexion PDO (remplacez ces informations par les vôtres)
+    $host = 'db'; // Le nom du service Docker MySQL
+    $dbname = getenv('MYSQL_DATABASE');
+    $username = getenv('MYSQL_USER');
+    $passwd = getenv('MYSQL_PASSWORD');
+
+    try {
+        $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $passwd);
+    } catch (PDOException $e) {
+        die("Erreur de connexion à la base de données: " . $e->getMessage());
+    }
+
+    $existingEmail = $pdo->prepare("SELECT COUNT(*) FROM user WHERE email = ?");
+    $existingEmail->execute([$email]);
+    $count = $existingEmail->fetchColumn();
+
+    if ($count > 0) {
+        $erreurs[] = "Un compte est déjà enregistré sous cette adresse mail.";
+    }
+
+    // Si aucune erreur, insérer l'utilisateur dans la base de données
+    if (empty($erreurs)) {
+        // Insertion dans la base de données
+
+        // Rediriger l'utilisateur vers une page de confirmation
+        header("Location: confirmation.php");
+        exit;
+    } else {
+        // Stocker les erreurs dans une session
+        $_SESSION['erreurs'] = $erreurs;
+        header("Location: " . $_SERVER['PHP_SELF']);
+        exit;
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,73 +78,21 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-
 <div class="container mt-5">
     <h2>Formulaire d'Inscription</h2>
     <?php
-    // Vérifier si le formulaire a été soumis
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        // Récupérer les données du formulaire
-        $name = $_POST['prenom'];
-        $surname = $_POST['nom'];
-        $email = $_POST['email'];
-        $password = $_POST['password'];
+    $erreurs = isset($_SESSION['erreurs']) ? $_SESSION['erreurs'] : [];
+    unset($_SESSION['erreurs']); // Effacez les erreurs de la session
 
-        // Valider et traiter les données (ajoutez ici vos validations)
-        $erreurs = [];
-
-        if (empty($name)) {
-            $erreurs[] = "Le prénom est requis.";
+    // Afficher les erreurs
+    if (!empty($erreurs)) {
+        echo '<div class="alert alert-danger">';
+        foreach ($erreurs as $erreur) {
+            echo "<p>$erreur</p>";
         }
-
-        if (empty($surname)) {
-            $erreurs[] = "Le nom est requis.";
-        }
-
-        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $erreurs[] = "L'adresse e-mail est invalide.";
-        }
-
-        if (empty($password)) {
-            $erreurs[] = "Le mot de passe est requis.";
-        }
-
-        if ($_POST['password'] !== $_POST['password_repeat']) {
-            $erreurs[] = "Les mots de passe ne correspondent pas.";
-        }
-
-        // Si aucune erreur, insérer l'utilisateur dans la base de données (ajoutez votre code PDO ici)
-        if (empty($erreurs)) {
-            // Créez une connexion PDO (remplacez ces informations par les vôtres)
-            $host = 'mysql'; // Le nom du service Docker MySQL
-            $dbname = getenv('MYSQL_DATABASE');
-            $username = getenv('MYSQL_USER');
-            $passwd = getenv('MYSQL_PASSWORD');
-
-            try {
-                $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $passwd);
-            } catch (PDOException $e) {
-                die("Erreur de connexion à la base de données: " . $e->getMessage());
-            }
-
-            // Insérez les données dans la base de données
-            $sql = "INSERT INTO user (name, surname, email, password) VALUES (?, ?, ?, ?)";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([$name, $surname, $email, password_hash($password, PASSWORD_DEFAULT)]);
-
-            // Redirigez l'utilisateur vers une page de confirmation
-            header("Location: confirmation.html");
-        } else {
-            // Afficher les erreurs
-            echo '<div class="alert alert-danger">';
-            foreach ($erreurs as $erreur) {
-                echo "<p>$erreur</p>";
-            }
-            echo '</div>';
-        }
+        echo '</div>';
     }
     ?>
-
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
         <!-- Champ : Prénom -->
         <div class="form-group">
@@ -110,10 +128,8 @@
         <button type="submit" class="btn btn-primary">S'inscrire</button>
     </form>
 </div>
-
 <!-- Inclure les scripts Bootstrap -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
 </body>
 </html>
