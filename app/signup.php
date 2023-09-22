@@ -2,13 +2,11 @@
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupérer les données du formulaire
     $name = $_POST['prenom'];
     $surname = $_POST['nom'];
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Valider et traiter les données (ajoutez ici vos validations)
     $erreurs = [];
 
     if (empty($name)) {
@@ -31,9 +29,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $erreurs[] = "Les mots de passe ne correspondent pas.";
     }
 
-    // Vérifier si l'adresse e-mail existe déjà dans la base de données
-    // Créez une connexion PDO (remplacez ces informations par les vôtres)
-    $host = 'db'; // Le nom du service Docker MySQL
+    $host = 'db';
     $dbname = getenv('MYSQL_DATABASE');
     $username = getenv('MYSQL_USER');
     $passwd = getenv('MYSQL_PASSWORD');
@@ -52,18 +48,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $erreurs[] = "Un compte est déjà enregistré sous cette adresse mail.";
     }
 
-    // Si aucune erreur, insérer l'utilisateur dans la base de données
     if (empty($erreurs)) {
-        // Insertion dans la base de données
         $sql = "INSERT INTO user (name, surname, email, password) VALUES (?, ?, ?, ?)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$name, $surname, $email, password_hash($password, PASSWORD_DEFAULT)]);
     
-        // Rediriger l'utilisateur vers une page de confirmation
         header("Location: confirmation.php");
         exit;
     } else {
-        // Stocker les erreurs dans une session
         $_SESSION['erreurs'] = $erreurs;
         header("Location: " . $_SERVER['PHP_SELF']);
         exit;
