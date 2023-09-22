@@ -2,12 +2,10 @@
 session_start();
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Récupérer l'e-mail et le mot de passe soumis dans le formulaire
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Créer une connexion PDO (remplacez ces informations par les vôtres)
-    $host = 'db'; // Le nom du service Docker MySQL
+    $host = 'db';
     $dbname = getenv('MYSQL_DATABASE');
     $username = getenv('MYSQL_USER');
     $passwd = getenv('MYSQL_PASSWORD');
@@ -18,28 +16,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Erreur de connexion à la base de données: " . $e->getMessage());
     }
 
-    // Requête SQL pour récupérer le mot de passe associé à l'adresse e-mail
     $sql = "SELECT password FROM user WHERE email = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$email]);
     $row = $stmt->fetch();
 
-    // Vérifier si l'adresse e-mail existe dans la base de données
     if ($row) {
         $hashedPassword = $row['password'];
 
-        // Vérifier si le mot de passe soumis correspond au mot de passe stocké (utilisez password_verify)
         if (password_verify($password, $hashedPassword)) {
-            // Mot de passe correct, vous pouvez rediriger l'utilisateur vers une page de succès ou effectuer d'autres actions
-            $_SESSION['user_email'] = $email; // Stocker l'e-mail de l'utilisateur connecté dans une session
-            header("Location: dashbord.php"); // Rediriger vers une page de succès
+            $_SESSION['user_email'] = $email;
+            header("Location: dashbord.php");
             exit;
         } else {
-            // Mot de passe incorrect
             $erreur = "Mot de passe incorrect.";
         }
     } else {
-        // L'adresse e-mail n'existe pas dans la base de données
         $erreur = "Adresse e-mail non enregistrée.";
     }
 }
