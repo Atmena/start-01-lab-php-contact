@@ -2,7 +2,7 @@
 session_start();
 
 if (isset($_SESSION['user_email'])) {
-    header("Location: success.php");
+    header("Location: dashbord.php");
     exit;
 }
 
@@ -41,7 +41,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             $_SESSION['user_email'] = $email;
 
-            header("Location: success.php");
+            header("Location: dashbord.php");
             exit;
         } else {
             $erreur = "Mot de passe incorrect.";

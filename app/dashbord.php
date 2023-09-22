@@ -1,3 +1,18 @@
+<?php
+if (isset($_GET['logout'])) {
+    // Détruire le cookie "user_email"
+    setcookie("user_email", "", time() - 3600, "/");
+
+    // Détruire la session
+    session_start();
+    session_unset();
+    session_destroy();
+
+    header("Location: index.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,9 +30,10 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ml-auto">            
+        <ul class="navbar-nav ml-auto">
+            <!-- Lien "Se déconnecter" -->
             <li class="nav-item">
-                <a class="nav-link" href="#">Se déconnecter</a>
+                <a class="nav-link" href="?logout">Se déconnecter</a>
             </li>
         </ul>
     </div>
