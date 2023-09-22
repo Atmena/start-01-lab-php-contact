@@ -55,7 +55,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Si aucune erreur, insérer l'utilisateur dans la base de données
     if (empty($erreurs)) {
         // Insertion dans la base de données
-
+        $sql = "INSERT INTO user (name, surname, email, password) VALUES (?, ?, ?, ?)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([$name, $surname, $email, password_hash($password, PASSWORD_DEFAULT)]);
+    
         // Rediriger l'utilisateur vers une page de confirmation
         header("Location: confirmation.php");
         exit;

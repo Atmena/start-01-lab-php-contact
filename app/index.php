@@ -94,10 +94,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <!-- Bouton d'envoi -->
-        <button type="submit" class="btn btn-primary">Se connecter</button>
+        <button type="submit" class="btn btn-primary" style="margin-bottom: 15px">Se connecter</button>
     </form>
-</div>
 
+    <div class="border-top">
+        <!-- Lien : Création de compte -->
+        <a href="signup.php"><button type="submit" class="btn btn-secondary border-top" style="margin-top: 15px">Créer un compte</button></a>
+    </div>
+</div>
 <!-- Inclure les scripts Bootstrap -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
