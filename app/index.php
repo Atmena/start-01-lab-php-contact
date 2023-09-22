@@ -21,7 +21,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Erreur de connexion à la base de données: " . $e->getMessage());
     }
 
-    $sql = "SELECT password FROM user WHERE email = ?";
+    $sql = "SELECT id, password FROM user WHERE email = ?";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([$email]);
     $row = $stmt->fetch();
@@ -40,6 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
             $_SESSION['user_email'] = $email;
+            $_SESSION['user_id'] = $row['id']; // Ajout de l'ID de l'utilisateur dans la session
 
             header("Location: dashbord.php");
             exit;
