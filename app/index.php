@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (isset($_SESSION['user_email'])) {
+    header("Location: success.php");
+    exit;
+}
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
     $password = $_POST['password'];
@@ -25,8 +30,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $hashedPassword = $row['password'];
 
         if (password_verify($password, $hashedPassword)) {
+            // Mot de passe correct, vérifiez si "Se souvenir de moi" est coché
+            if (isset($_POST['rememberMe'])) {
+                // Créez un cookie avec l'identifiant de l'utilisateur (par exemple, l'e-mail)
+                $cookie_name = "user_email";
+                $cookie_value = $email;
+                $cookie_duration = 30 * 24 * 60 * 60; // Durée du cookie en secondes (30 jours)
+                setcookie($cookie_name, $cookie_value, time() + $cookie_duration, "/");
+            }
+
             $_SESSION['user_email'] = $email;
-            header("Location: dashbord.php");
+
+            header("Location: success.php");
             exit;
         } else {
             $erreur = "Mot de passe incorrect.";
