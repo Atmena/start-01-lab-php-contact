@@ -1,14 +1,46 @@
 <?php
+session_start();
+
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['user_id'])) {
+    header("Location: index.php");
+    exit;
+}
+
 if (isset($_GET['logout'])) {
     // Détruire le cookie "user_email"
     setcookie("user_email", "", time() - 3600, "/");
 
     // Détruire la session
-    session_start();
     session_unset();
     session_destroy();
 
     header("Location: index.php");
+    exit;
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $surname = $_POST['surname'];
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $user_id = $_POST['user_id'];
+
+    $host = 'db';
+    $dbname = getenv('MYSQL_DATABASE');
+    $username = getenv('MYSQL_USER');
+    $passwd = getenv('MYSQL_PASSWORD');
+
+    try {
+        $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $passwd);
+    } catch (PDOException $e) {
+        die("Erreur de connexion à la base de données: " . $e->getMessage());
+    }
+
+    $sql = "INSERT INTO contact (name, surname, email, user_id) VALUES (?, ?, ?, ?)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$name, $surname, $email, $user_id]);
+
+    header("Location: dashbord.php");
     exit;
 }
 ?>
@@ -45,19 +77,21 @@ if (isset($_GET['logout'])) {
     <div class="row">
         <div class="col-md-6">
             <!-- Formulaire d'ajout de contact -->
-            <form>
+            <form method="POST">
                 <div class="form-group">
-                    <label for="nom">Nom</label>
-                    <input type="text" class="form-control" id="nom" name="nom" required>
+                    <label for="surname">Nom</label>
+                    <input type="text" class="form-control" id="surname" name="surname" required>
                 </div>
                 <div class="form-group">
-                    <label for="prenom">Prénom</label>
-                    <input type="text" class="form-control" id="prenom" name="prenom" required>
+                    <label for="name">Prénom</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
                 </div>
                 <div class="form-group">
                     <label for="email">Adresse e-mail</label>
                     <input type="email" class="form-control" id="email" name="email" required>
                 </div>
+                <!-- Ajoutez un champ caché pour l'ID de l'utilisateur -->
+                <input type="hidden" name="user_id" value="<?php echo $_SESSION['user_id']; ?>">
                 <button type="submit" class="btn btn-primary">Ajouter Contact</button>
             </form>
         </div>
@@ -65,9 +99,30 @@ if (isset($_GET['logout'])) {
             <!-- Liste des contacts -->
             <h3>Liste des Contacts</h3>
             <ul class="list-group">
-                <li class="list-group-item">John Doe - john.doe@example.com</li>
-                <li class="list-group-item">Jane Smith - jane.smith@example.com</li>
-                <li class="list-group-item">Michael Johnson - michael.johnson@example.com</li>
+                <!-- Affichez ici la liste des contacts depuis la base de données -->
+                <?php
+
+                $host = 'db';
+                $dbname = getenv('MYSQL_DATABASE');
+                $username = getenv('MYSQL_USER');
+                $passwd = getenv('MYSQL_PASSWORD');
+
+                try {
+                    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $passwd);
+                } catch (PDOException $e) {
+                    die("Erreur de connexion à la base de données: " . $e->getMessage());
+                }
+
+                $user_id = $_SESSION['user_id'];
+
+                $stmt = $pdo->prepare("SELECT name, surname, email FROM contact WHERE user_id = ?");
+                $stmt->execute([$user_id]);
+                $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($contacts as $contact) {
+                    echo '<li class="list-group-item">' . $contact['name'] . ' ' . $contact['surname'] . ' - ' . $contact['email'] . '</li>';
+                }
+                ?>
             </ul>
         </div>
     </div>
