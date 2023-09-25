@@ -11,7 +11,7 @@
 <div class="container mt-5 text-center">
     <h2>Confirmation de l'Inscription</h2>
     <p>Votre compte a été créé avec succès.</p>
-    <p>Vous serez redirigé vers la page d'accueil dans <span id="countdown">10</span> secondes.</p>
+    <p>Vous serez redirigé vers la page d'accueil dans <span id="countdown">5</span> secondes.</p>
 </div>
 
 <!-- Inclure les scripts Bootstrap -->
