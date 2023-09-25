@@ -90,18 +90,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <!-- Lien : Mot de passe oublié -->
-        <!-- <div class="form-group">
-            <a href="#">Mot de passe oublié ?</a>
-        </div> -->
+        <div class="form-group">
+            <a href="signup.php">Créer un compte</a> &emsp;&emsp; <!-- <a href="#">Mot de passe oublié ?</a> -->
+        </div>
 
         <!-- Bouton d'envoi -->
         <button type="submit" class="btn btn-primary" style="margin-bottom: 15px">Se connecter</button>
     </form>
-
-    <div class="border-top">
-        <!-- Lien : Création de compte -->
-        <a href="signup.php"><button type="submit" class="btn btn-secondary border-top" style="margin-top: 15px">Créer un compte</button></a>
-    </div>
 </div>
 <!-- Inclure les scripts Bootstrap -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
