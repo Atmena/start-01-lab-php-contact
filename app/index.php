@@ -90,9 +90,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <!-- Lien : Mot de passe oublié -->
-        <div class="form-group">
+        <!-- <div class="form-group">
             <a href="#">Mot de passe oublié ?</a>
-        </div>
+        </div> -->
 
         <!-- Bouton d'envoi -->
         <button type="submit" class="btn btn-primary" style="margin-bottom: 15px">Se connecter</button>
