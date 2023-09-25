@@ -29,10 +29,9 @@ CREATE TABLE `contact` (
   `email` varchar(45) NOT NULL,
   `user_id` int NOT NULL,
   PRIMARY KEY (`idcontact`),
-  UNIQUE KEY `email_UNIQUE` (`email`),
   KEY `fk_contact_user_idx` (`user_id`),
   CONSTRAINT `fk_contact_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,6 +40,7 @@ CREATE TABLE `contact` (
 
 LOCK TABLES `contact` WRITE;
 /*!40000 ALTER TABLE `contact` DISABLE KEYS */;
+INSERT INTO `contact` VALUES (3,'Stéphane','Tireau','tireau.steph@gmail.com',7),(4,'Céline','Maille','macema4@gmail.com',7),(12,'Romain','Tireau','tireau.romain@gmail.com',9);
 /*!40000 ALTER TABLE `contact` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-09-25  9:28:25
+-- Dump completed on 2023-09-25 14:21:15
